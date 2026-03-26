@@ -1,17 +1,14 @@
-export const dynamic = 'force-dynamic'
 'use client'
 
-
-import { useState, FormEvent, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, FormEvent, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
-function RegisterPageContent() {
+export default function RegisterPage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const plan = searchParams.get('plan') || 'monthly'
 
+  const [plan, setPlan] = useState('monthly')
   const [form, setForm] = useState({
     full_name: '',
     email: '',
@@ -20,6 +17,15 @@ function RegisterPageContent() {
 
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  // ✅ Get query param WITHOUT useSearchParams
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const planParam = params.get('plan')
+      if (planParam) setPlan(planParam)
+    }
+  }, [])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -106,13 +112,5 @@ function RegisterPageContent() {
         </p>
       </div>
     </div>
-  )
-}
-
-export default function RegisterPage() {
-  return (
-    <Suspense fallback={<div className="text-white text-center mt-10">Loading...</div>}>
-      <RegisterPageContent />
-    </Suspense>
   )
 }
