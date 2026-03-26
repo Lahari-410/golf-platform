@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
     // If 5 scores already exist, delete the oldest
     if (existing && existing.length >= 5) {
       const oldest = existing[existing.length - 1]
+        // @ts-ignore
       await supabaseAdmin.from('scores').delete().eq('id', oldest.id)
     }
 

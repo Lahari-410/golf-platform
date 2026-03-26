@@ -13,9 +13,8 @@ const supabaseAdmin = createClient(
 
 export async function GET() {
   try {
-    const admin = supabaseAdmin
     // @ts-ignore
-const { data, error } = await admin
+const { data, error } = await supabaseAdmin
       .from('draws')
       .select('*')
       .eq('status', 'published')
