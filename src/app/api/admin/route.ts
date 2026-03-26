@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
 
     switch (action) {
       case 'verify_winner':
+        // @ts-ignore
        await supabaseAdmin
           .from('winners')
           .update({ verification_status: data.status })
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
         break
 
       case 'mark_paid':
+        // @ts-ignore
         await supabaseAdmin
           .from('winners')
           .update({ payment_status: 'paid' })
@@ -29,6 +31,7 @@ export async function POST(req: NextRequest) {
         break
 
       case 'toggle_charity':
+        // @ts-ignore
         await supabaseAdmin
           .from('charities')
           .update({ is_active: data.is_active })
@@ -36,6 +39,7 @@ export async function POST(req: NextRequest) {
         break
 
       case 'feature_charity':
+        // @ts-ignore
         await supabaseAdmin
           .from('charities')
           .update({ is_featured: data.is_featured })

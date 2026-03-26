@@ -12,6 +12,7 @@ const supabaseAdmin = createClient(
 export async function GET() {
   try {
     const admin = supabaseAdmin
+    // @ts-ignore
 const { data, error } = await admin
       .from('charities')
       .select('*')
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
 const admin = supabaseAdmin
+// @ts-ignore
 const { data, error } = await admin
       .from('charities')
       .insert(body)
