@@ -12,7 +12,10 @@ if (!supabaseUrl || !serviceKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-const supabaseAdmin = createClient(supabaseUrl, serviceKey)
+const supabaseAdmin = createClient(
+  supabaseUrl as string,
+  serviceKey as string
+)
 
 export async function GET(req: NextRequest) {
   try {
