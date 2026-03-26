@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     // Generate winning numbers
     let winningNumbers: number[]
     if (draw_type === 'algorithmic') {
-      const { data: allScores } = await supabaseAdmin!.from('scores').select('*')
+      const { data: allScores } = await supabaseAdmin.from('scores').select('*')
       winningNumbers = generateAlgorithmicDraw((allScores || []) as Score[])
     } else {
       winningNumbers = generateRandomDraw()
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       if (matches >= 3) {
         const matchType = matches === 5 ? '5-match' : matches === 4 ? '4-match' : '3-match'
         const prize = matches === 5 ? pools.jackpot : matches === 4 ? pools.fourMatch : pools.threeMatch
-        await supabaseAdmin!.from('winners').insert({
+        await supabaseAdmin.from('winners').insert({
           draw_id: draw.id,
           user_id: userId,
           match_type: matchType,
