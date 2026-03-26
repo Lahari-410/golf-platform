@@ -1,15 +1,21 @@
 'use client'
-import { useState, FormEvent } from 'react'
+
+import { useState, FormEvent, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const plan = searchParams.get('plan') || 'monthly'
 
-  const [form, setForm] = useState({ full_name: '', email: '', password: '' })
+  const [form, setForm] = useState({
+    full_name: '',
+    email: '',
+    password: ''
+  })
+
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -19,8 +25,7 @@ export default function RegisterPage() {
     setLoading(true)
 
     try {
-      // Sign up with Supabase Auth
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
         options: {
@@ -30,7 +35,6 @@ export default function RegisterPage() {
 
       if (signUpError) throw signUpError
 
-      // Redirect to subscription page with plan
       router.push(`/subscribe?plan=${plan}`)
     } catch (err: any) {
       setError(err.message || 'Registration failed')
@@ -42,8 +46,11 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-slate-800 rounded-2xl p-8 border border-slate-700">
+        
         <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-bold text-green-400">GolfGive</Link>
+          <Link href="/" className="text-2xl font-bold text-green-400">
+            GolfGive
+          </Link>
           <p className="text-slate-400 mt-2">Create your account</p>
         </div>
 
@@ -60,13 +67,17 @@ export default function RegisterPage() {
             { name: 'password', label: 'Password', type: 'password', placeholder: 'Min. 6 characters' },
           ].map(field => (
             <div key={field.name}>
-              <label className="block text-sm font-medium text-slate-300 mb-1">{field.label}</label>
+              <label className="block text-sm font-medium text-slate-300 mb-1">
+                {field.label}
+              </label>
               <input
                 type={field.type}
                 required
                 placeholder={field.placeholder}
                 value={form[field.name as keyof typeof form]}
-                onChange={e => setForm({ ...form, [field.name]: e.target.value })}
+                onChange={e =>
+                  setForm({ ...form, [field.name]: e.target.value })
+                }
                 className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-green-500"
               />
             </div>
@@ -76,17 +87,30 @@ export default function RegisterPage() {
             Plan: <strong>{plan === 'yearly' ? '£100/year' : '£10/month'}</strong> — you will set up payment next
           </div>
 
-          <button type="submit" disabled={loading}
-            className="w-full py-3 bg-green-500 hover:bg-green-400 disabled:bg-green-800 text-white font-semibold rounded-xl transition">
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-green-500 hover:bg-green-400 disabled:bg-green-800 text-white font-semibold rounded-xl transition"
+          >
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 
         <p className="text-center text-slate-400 text-sm mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-green-400 hover:underline">Sign in</Link>
+          <Link href="/login" className="text-green-400 hover:underline">
+            Sign in
+          </Link>
         </p>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="text-white text-center mt-10">Loading...</div>}>
+      <RegisterPageContent />
+    </Suspense>
   )
 }
