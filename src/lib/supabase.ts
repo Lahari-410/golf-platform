@@ -7,15 +7,8 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 
-// Browser client — respects Row Level Security
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Server/admin client — bypasses RLS (use only in API routes)
-export const supabaseAdmin =
-  typeof window === "undefined"
-    ? createClient(
-        supabaseUrl,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-      )
-    : null;
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)

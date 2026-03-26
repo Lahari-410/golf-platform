@@ -2,13 +2,18 @@
 // API route: POST /api/draws — admin creates/publishes a draw
 
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
 import { generateRandomDraw, generateAlgorithmicDraw, calculatePrizePools } from '@/lib/drawEngine'
 import { Score } from '@/types'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function GET() {
   try {
-    const admin = supabaseAdmin!
+    const admin = supabaseAdmin
 const { data, error } = await admin
       .from('draws')
       .select('*')
@@ -41,7 +46,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Calculate prize pool
-    const { data: activeUsers } = await supabaseAdmin!
+    const { data: activeUsers } = await supabaseAdmin
       .from('profiles')
       .select('subscription_plan')
       .eq('subscription_status', 'active')
@@ -52,7 +57,7 @@ export async function POST(req: NextRequest) {
     const pools = calculatePrizePools(totalPool)
 
     // Create draw
-    const { data: draw, error } = await supabaseAdmin!
+    const { data: draw, error } = await supabaseAdmin
       .from('draws')
       .insert({
         draw_date: new Date().toISOString().split('T')[0],
@@ -70,7 +75,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error
 
     // Match all subscribers' scores
-    const { data: allScores } = await supabaseAdmin!
+    const { data: allScores } = await supabaseAdmin
       .from('scores')
       .select('user_id, score')
 
