@@ -1,20 +1,20 @@
 'use client'
-import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
-
-// This page handles Stripe checkout
-// It calls our API which creates a Stripe Checkout Session
-// Then redirects user to Stripe's hosted payment page
+import { useState, useEffect } from 'react'
 
 export default function SubscribePage() {
-  const searchParams = useSearchParams()
-  const plan = searchParams.get('plan') || 'monthly'
+  const [plan, setPlan] = useState('monthly')
   const [loading, setLoading] = useState(false)
+
+  // ✅ get query param safely
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const planParam = params.get('plan')
+    if (planParam) setPlan(planParam)
+  }, [])
 
   const handleSubscribe = async () => {
     setLoading(true)
     try {
-      // Call our API to create a Stripe Checkout Session
       const res = await fetch('/api/subscriptions/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -23,7 +23,6 @@ export default function SubscribePage() {
       const data = await res.json()
 
       if (data.url) {
-        // Redirect to Stripe's payment page
         window.location.href = data.url
       } else {
         alert('Error creating checkout session')
@@ -44,7 +43,9 @@ export default function SubscribePage() {
           <p className="text-slate-400 text-sm mb-1">Selected plan</p>
           <p className="text-3xl font-bold text-white">
             {plan === 'yearly' ? '£100' : '£10'}
-            <span className="text-lg text-slate-400">/{plan === 'yearly' ? 'year' : 'month'}</span>
+            <span className="text-lg text-slate-400">
+              /{plan === 'yearly' ? 'year' : 'month'}
+            </span>
           </p>
           {plan === 'yearly' && (
             <p className="text-green-400 text-sm mt-1">Save £20 vs monthly</p>
@@ -58,8 +59,11 @@ export default function SubscribePage() {
           <li>✓ Cancel anytime</li>
         </ul>
 
-        <button onClick={handleSubscribe} disabled={loading}
-          className="w-full py-3 bg-green-500 hover:bg-green-400 disabled:bg-green-800 text-white font-semibold rounded-xl transition">
+        <button
+          onClick={handleSubscribe}
+          disabled={loading}
+          className="w-full py-3 bg-green-500 hover:bg-green-400 disabled:bg-green-800 text-white font-semibold rounded-xl transition"
+        >
           {loading ? 'Redirecting to payment...' : 'Continue to Payment'}
         </button>
 
